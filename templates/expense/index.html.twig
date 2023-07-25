@@ -1,0 +1,214 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Expense index{% endblock %}
+
+{% block body %}
+<div class="container-sm mt-5">
+
+<a href="" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#CreateModal">Create new</a>
+
+    <h1>Expense index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+                <th>Description</th>
+                <th>TotalAmount</th>
+                <th>Responsabilities</th>
+                <th>UpdatedAt</th>
+                <th>CreatedAt</th>
+                <th>DeletedAt</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for expense in expenses %}
+            <tr>
+                <td>{{ expense.id }}</td>
+                <td>{{ expense.name }}</td>
+                <td>{{ expense.description }}</td>
+                <td>{{ expense.totalAmount }}</td>
+                <td>{{ expense.responsabilities }}</td>
+                <td>{{ expense.updatedAt ? expense.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ expense.createdAt ? expense.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ expense.deletedAt ? expense.deletedAt|date('Y-m-d H:i:s') : '' }}</td>
+                <td>
+
+                    <a href="" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#ShowModal{{ expense.id }}">show</a>
+
+                    <a href="" class="btn btn-warning ajax_edit" id="{{expense.id}}"  ajax_url = {{ path('app_expense_edit', {'id': expense.id}) }} >edit</a>
+
+                    <a href="#" class="btn btn-danger">delete</a>
+
+                </td>
+
+
+            </tr>
+
+
+        {% else %}
+
+            <tr>
+                <td colspan="9">no records found</td>
+            </tr>
+
+
+        {% endfor %}
+        </tbody>
+    </table>
+
+
+    <!-- Modal Creat -->
+    <div class="modal fade" id="CreateModal" tabindex="-1" aria-labelledby="CreateModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="CreateModalLabel">Create</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                {{ form_start(form, { 'action': path('app_expense_new') }) }}
+                <div class="modal-body">
+                    <!-- Ici Vous pouvez personaliser l'affichage du formulaire -->
+
+                    {{ form_widget(form) }}
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button class="btn btn-primary">{{ button_label|default('Save') }}</button>
+
+                </div>
+                {{ form_end(form) }}
+            </div>
+        </div>
+    </div>
+    <!-- Fin Modal Creat -->
+
+
+    <!-- ========================================= -->
+    <!-- Modal Edit -->
+        <div class="modal fade" id="EditModal" tabindex="-1" aria-labelledby="EditModalModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="EditModalModalLabel}}">Edit</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body" id="edit-modal-body">
+                        <!-- le formulaire d'edition s'affichera ici -->
+                        
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">back to list</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    <!-- Fin Modal Edit -->
+    <!-- ========================================= -->
+
+
+    <!-- Modal show -->
+    <!-- ========================================= -->
+
+    {% for expense in expenses %}
+
+        <div class="modal fade" id="ShowModal{{ expense.id }}" tabindex="-1" aria-labelledby="ShowModalLabel{{ expense.id }}" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="ShowModalLabel{{ expense.id }}">Expense</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+
+                        <table class="table">
+                            <tbody>
+                            <tr>
+                                <th>Id</th>
+                                <td>{{ expense.id }}</td>
+                            </tr>
+                            <tr>
+                                <th>Name</th>
+                                <td>{{ expense.name }}</td>
+                            </tr>
+                            <tr>
+                                <th>Description</th>
+                                <td>{{ expense.description }}</td>
+                            </tr>
+                            <tr>
+                                <th>TotalAmount</th>
+                                <td>{{ expense.totalAmount }}</td>
+                            </tr>
+                            <tr>
+                                <th>Responsabilities</th>
+                                <td>{{ expense.responsabilities }}</td>
+                            </tr>
+                            <tr>
+                                <th>UpdatedAt</th>
+                                <td>{{ expense.updatedAt ? expense.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
+                            </tr>
+                            <tr>
+                                <th>CreatedAt</th>
+                                <td>{{ expense.createdAt ? expense.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+                            </tr>
+                            <tr>
+                                <th>DeletedAt</th>
+                                <td>{{ expense.deletedAt ? expense.deletedAt|date('Y-m-d H:i:s') : '' }}</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                        
+                        {{ include('expense/_delete_form.html.twig') }}
+                    </div>
+                    <div class="modal-footer">
+                        <!-- Le bouton Edit utilise ajax pour charger le modal Edit -->
+                        <button type="button" class="btn btn-primary ajax_edit" ajax_url = {{ path('app_expense_edit', {'id': expense.id}) }} data-bs-dismiss="modal">Edit</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">back to list</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    {% endfor %}
+
+    <!-- Fin Modal show -->
+    <!-- ========================================= -->
+
+
+</div>
+
+<!-- Pour une bonne lisibilité, deplacer le script dans votre dossier JS (asset) -->
+<script>
+    $(document).ready(function() {
+        $('.ajax_edit').click(function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            var url = $(this).attr("ajax_url")
+
+            $.ajax({
+                url: url,
+                type: 'GET',
+            })
+                .done(function(data) {
+
+                    // charger le dormulaire retouré par la vue Edit dans le body du modal Edit
+                    $('#edit-modal-body').html(data)
+
+                    // Afficher le modal
+                    $('#EditModal').modal('show');
+
+                })
+                .fail(function(xhr, textStatus, errorThrown) {
+                    // Gérer les erreurs ici
+                    console.log('Une erreur s\'est produite lors de l\'appel AJAX.');
+                });
+        });
+    });
+</script>
+
+{% endblock %}
